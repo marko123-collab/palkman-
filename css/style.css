@@ -1,0 +1,1030 @@
+/* ==========================================================================
+   KOZMINSKI ESCAPE: POLOWANIE NA ECTS
+   Akademia Leona Koźmińskiego (ALK) - Arkusz stylów retro-arcade
+   ========================================================================== */
+
+/* 1. Oficjalna paleta barw Akademii Leona Koźmińskiego i zmienne CSS */
+:root {
+  /* Kolory bazowe ALK z briefu */
+  --alk-navy: #002244;            /* Główny granat ALK */
+  --alk-bg-dark: #0a1128;         /* Ciemny granat tła */
+  --alk-gold: #f2a900;            /* Akcentowe złoto ALK */
+  --alk-gold-light: #ffc740;      /* Jasne złoto ALK */
+  --alk-blue: #004b87;            /* Kolor niebieski ALK */
+
+  /* Kolory uzupełniające & nastrojowe */
+  --alk-gold-border: rgba(242, 169, 0, 0.45);
+  --alk-gold-glow: rgba(242, 169, 0, 0.35);
+  --alk-surface-glass: rgba(0, 34, 68, 0.82);
+  --alk-card-bg: linear-gradient(145deg, #0d223f, #071526);
+  --alk-patio-green: #2d6a4f;
+  --alk-danger-red: #d90429;
+  --alk-danger-light: #ef233c;
+  --alk-text-light: #f8fafc;
+  --alk-text-muted: #94a3b8;
+
+  /* Fonty */
+  --font-main: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+/* Podstawowy reset */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+/* Wycentrowanie całego układu w oknie przeglądarki (Mobile-first & Desktop) */
+html, body {
+  width: 100%;
+  min-height: 100vh;
+  background-color: var(--alk-bg-dark);
+  color: var(--alk-text-light);
+  font-family: var(--font-main);
+  overflow-x: hidden;
+  touch-action: manipulation;
+}
+
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-image:
+    radial-gradient(circle at 50% 0%, rgba(0, 75, 135, 0.45) 0%, transparent 60%),
+    radial-gradient(circle at 15% 85%, rgba(45, 106, 79, 0.25) 0%, transparent 50%),
+    radial-gradient(circle at 85% 85%, rgba(242, 169, 0, 0.15) 0%, transparent 50%);
+  background-attachment: fixed;
+  padding: 12px;
+}
+
+/* Główny kontener aplikacji - wyśrodkowany i zbalansowany */
+.game-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 860px;
+  gap: 12px;
+  margin: 0 auto;
+}
+
+/* ==========================================================================
+   2. SZKLANY HUD Z EFEKTEM BLUR I ZŁOTĄ RAMKĄ
+   ========================================================================== */
+.hud-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  width: 100%;
+  padding: 10px 18px;
+  background: var(--alk-surface-glass);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1.5px solid var(--alk-gold);
+  border-radius: 14px;
+  box-shadow: 
+    0 8px 30px rgba(0, 0, 0, 0.55),
+    0 0 16px var(--alk-gold-glow),
+    inset 0 1px 1px rgba(255, 255, 255, 0.15);
+  flex-wrap: wrap;
+}
+
+/* Branding ALK Warszawa */
+.hud-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.hud-lion-logo {
+  font-size: 1.9rem;
+  filter: drop-shadow(0 2px 6px var(--alk-gold-glow));
+  animation: logo-glow 3s infinite ease-in-out;
+}
+
+.hud-title-wrap {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+
+.hud-university-name {
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  color: var(--alk-gold-light);
+  text-transform: uppercase;
+}
+
+.hud-game-title {
+  font-size: 1.05rem;
+  font-weight: 900;
+  color: #ffffff;
+  letter-spacing: -0.01em;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* Metryki HUD (ECTS, Stamina) */
+.hud-metric {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 140px;
+  flex: 1;
+}
+
+.hud-metric-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: var(--alk-text-muted);
+}
+
+.hud-metric-icon {
+  font-size: 0.95rem;
+}
+
+.hud-metric-label {
+  letter-spacing: 0.05em;
+  color: #e2e8f0;
+}
+
+.hud-metric-value {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 0.88rem;
+  color: #ffffff;
+}
+
+.hud-ects .hud-metric-value strong {
+  color: var(--alk-gold-light);
+  font-size: 1.1rem;
+}
+
+/* Tło pasków postępu */
+.progress-bar-bg {
+  width: 100%;
+  height: 10px;
+  background: rgba(10, 17, 40, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  overflow: hidden;
+  box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.6);
+}
+
+.progress-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Pasek ECTS */
+.ects-fill {
+  background: linear-gradient(90deg, var(--alk-gold), var(--alk-gold-light));
+  box-shadow: 0 0 12px var(--alk-gold-glow);
+}
+
+/* Pasek staminy z płynnym przejściem gradientowym */
+.stamina-fill {
+  background: linear-gradient(90deg, var(--alk-blue), #00b4d8, var(--alk-gold-light));
+  box-shadow: 0 0 10px rgba(0, 180, 216, 0.55);
+}
+
+.stamina-fill.boost {
+  background: linear-gradient(90deg, #2ec4b6, #2ecc71, var(--alk-gold-light));
+  box-shadow: 0 0 14px rgba(46, 204, 113, 0.8);
+}
+
+/* Badge statusu i kontrolki HUD */
+.hud-controls-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  transition: all 0.25s ease;
+  white-space: nowrap;
+}
+
+.status-safe {
+  background: rgba(45, 106, 79, 0.35);
+  color: #74c69d;
+  border: 1px solid rgba(116, 198, 157, 0.45);
+}
+
+.status-safe .status-dot {
+  background: #52b788;
+  box-shadow: 0 0 8px #52b788;
+}
+
+.status-chase {
+  background: rgba(217, 4, 41, 0.3);
+  color: #ff6b6b;
+  border: 1px solid var(--alk-danger-light);
+  animation: pulse-danger 0.75s infinite alternate;
+}
+
+.status-chase .status-dot {
+  background: var(--alk-danger-light);
+  box-shadow: 0 0 10px var(--alk-danger-light);
+}
+
+.status-coffee {
+  background: rgba(242, 169, 0, 0.3);
+  color: var(--alk-gold-light);
+  border: 1px solid var(--alk-gold);
+}
+
+.status-coffee .status-dot {
+  background: var(--alk-gold-light);
+  box-shadow: 0 0 8px var(--alk-gold-light);
+}
+
+.status-shield {
+  background: rgba(0, 180, 216, 0.28);
+  color: #48cae4;
+  border: 1px solid #00b4d8;
+  box-shadow: 0 0 10px rgba(0, 180, 216, 0.4);
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.hud-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--alk-gold-border);
+  color: #ffffff;
+  padding: 6px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1.15rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.hud-btn:hover {
+  background: rgba(242, 169, 0, 0.25);
+  border-color: var(--alk-gold);
+  transform: translateY(-2px) scale(1.05);
+}
+
+/* ==========================================================================
+   3. SCENA GRY, CANVAS I KOMIKSOWY DYMEK NAD PROFESOREM
+   ========================================================================== */
+.game-stage {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  position: relative;
+}
+
+.game-container {
+  position: relative;
+  width: 100%;
+  max-width: 800px;
+  aspect-ratio: 800 / 540;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 
+    0 20px 45px rgba(0, 0, 0, 0.75),
+    0 0 0 2px var(--alk-gold),
+    0 0 28px rgba(0, 34, 68, 0.6);
+  background-color: #071520;
+}
+
+#gameCanvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: #0f2027;
+  cursor: crosshair;
+  outline: none;
+}
+
+/* Komiksowy dymek nad profesorem z animacją wyskakiwania i trójkątnym wskaźnikiem */
+.speech-bubble {
+  position: absolute;
+  top: 14px;
+  left: 50%;
+  transform: translateX(-50%) scale(0.7);
+  width: calc(100% - 40px);
+  max-width: 540px;
+  background: #ffffff;
+  color: #002244;
+  border: 3px solid var(--alk-danger-red);
+  border-radius: 16px;
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 
+    0 12px 32px rgba(0, 0, 0, 0.65),
+    0 0 18px rgba(217, 4, 41, 0.5);
+  z-index: 25;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease, transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.35);
+}
+
+/* Trójkątny wskaźnik komiksowego dymka (strzałka skierowana w dół ku profesorowi) */
+.speech-bubble::after {
+  content: '';
+  position: absolute;
+  bottom: -14px;
+  left: 50px;
+  width: 0;
+  height: 0;
+  border-left: 12px solid transparent;
+  border-right: 12px solid transparent;
+  border-top: 14px solid #ffffff;
+  filter: drop-shadow(0 3px 2px rgba(0, 0, 0, 0.3));
+}
+
+.speech-bubble::before {
+  content: '';
+  position: absolute;
+  bottom: -18px;
+  left: 48px;
+  width: 0;
+  height: 0;
+  border-left: 14px solid transparent;
+  border-right: 14px solid transparent;
+  border-top: 18px solid var(--alk-danger-red);
+}
+
+/* Aktywna animacja wyskakiwania (Pop-in) */
+.speech-bubble.active {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) scale(1);
+  animation: pop-in 0.28s cubic-bezier(0.175, 0.885, 0.32, 1.35) forwards;
+}
+
+.bubble-avatar-wrapper {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.bubble-avatar {
+  font-size: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  background: rgba(217, 4, 41, 0.1);
+  border-radius: 12px;
+  border: 2px solid var(--alk-danger-red);
+}
+
+.bubble-pen-badge {
+  position: absolute;
+  bottom: -4px;
+  right: -6px;
+  font-size: 1.05rem;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.8));
+}
+
+.bubble-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow: hidden;
+  text-align: left;
+}
+
+.bubble-header {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.bubble-title {
+  font-size: 0.82rem;
+  font-weight: 900;
+  color: var(--alk-danger-red);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.bubble-subject {
+  font-size: 0.68rem;
+  color: #475569;
+  font-style: italic;
+  font-weight: 600;
+}
+
+.bubble-text {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #002244;
+  line-height: 1.25;
+}
+
+/* ==========================================================================
+   4. NOWOCZESNE KARTY MODALNE ZE ZŁOTYMI PRZYCISKAMI (HOVER/SCALE)
+   ========================================================================== */
+.modal-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(10, 17, 40, 0.9);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  z-index: 50;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.modal-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.modal-overlay.hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.modal-card {
+  background: var(--alk-card-bg);
+  border: 2px solid var(--alk-gold);
+  border-radius: 20px;
+  width: 100%;
+  max-width: 600px;
+  padding: 24px 28px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 14px;
+  box-shadow: 
+    0 24px 60px rgba(0, 0, 0, 0.8),
+    0 0 25px var(--alk-gold-glow);
+  animation: modal-enter 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  max-height: 94%;
+  overflow-y: auto;
+}
+
+.modal-badge {
+  background: rgba(242, 169, 0, 0.16);
+  border: 1px solid var(--alk-gold);
+  color: var(--alk-gold-light);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  padding: 4px 14px;
+  border-radius: 999px;
+  text-transform: uppercase;
+}
+
+.game-headline {
+  font-size: 1.85rem;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  color: #ffffff;
+  line-height: 1.1;
+  text-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
+}
+
+.game-headline .subtitle {
+  display: block;
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--alk-gold-light);
+  margin-top: 4px;
+  letter-spacing: 0.05em;
+}
+
+.story-box {
+  background: rgba(0, 34, 68, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-size: 0.88rem;
+  line-height: 1.45;
+  color: #cbd5e1;
+}
+
+.story-box strong {
+  color: #ffffff;
+}
+
+/* Siatka legendy */
+.legend-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  width: 100%;
+  text-align: left;
+}
+
+.legend-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 8px 10px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+}
+
+.legend-item.danger {
+  border-color: rgba(217, 4, 41, 0.4);
+  background: rgba(217, 4, 41, 0.1);
+}
+
+.legend-icon {
+  font-size: 1.4rem;
+  flex-shrink: 0;
+}
+
+.legend-desc {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.legend-desc strong {
+  font-size: 0.78rem;
+  color: #ffffff;
+}
+
+.legend-desc span {
+  font-size: 0.7rem;
+  color: var(--alk-text-muted);
+  line-height: 1.2;
+}
+
+/* Sterowanie w modalu */
+.controls-legend {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px 12px;
+  background: rgba(0, 34, 68, 0.6);
+  border-radius: 10px;
+  border: 1px dashed var(--alk-gold-border);
+}
+
+.controls-title {
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--alk-gold-light);
+  letter-spacing: 0.08em;
+  text-align: left;
+}
+
+.keys-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 0.76rem;
+  color: var(--alk-text-light);
+  align-items: center;
+}
+
+.key-tag kbd {
+  background: rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 0.75rem;
+  margin: 0 2px;
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.5);
+}
+
+.mobile-only-text {
+  display: none;
+  color: var(--alk-gold-light);
+  font-weight: 700;
+}
+
+/* Złote przyciski z efektem hover / scale */
+.modal-actions {
+  margin-top: 4px;
+  width: 100%;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-family: var(--font-main);
+  font-weight: 900;
+  font-size: 1.05rem;
+  padding: 14px 28px;
+  border-radius: 14px;
+  cursor: pointer;
+  border: none;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  transition: all 0.22s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.btn-large {
+  width: 100%;
+}
+
+/* Główny złoty przycisk z efektem scale/hover */
+.btn-primary,
+.btn-gold {
+  background: linear-gradient(135deg, var(--alk-gold-light), var(--alk-gold));
+  color: var(--alk-navy);
+  box-shadow: 
+    0 6px 20px var(--alk-gold-glow),
+    0 0 15px rgba(242, 169, 0, 0.4);
+  border: 1px solid #ffffff;
+}
+
+.btn-primary:hover,
+.btn-gold:hover {
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 
+    0 10px 28px rgba(242, 169, 0, 0.65),
+    0 0 24px var(--alk-gold-light);
+  background: linear-gradient(135deg, #ffe082, var(--alk-gold-light));
+}
+
+.btn-primary:active,
+.btn-gold:active {
+  transform: translateY(2px) scale(0.97);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.5);
+}
+
+/* Przycisk porażki */
+.btn-danger {
+  background: linear-gradient(135deg, #ff4d6d, var(--alk-danger-red));
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 6px 20px rgba(217, 4, 41, 0.5);
+}
+
+.btn-danger:hover {
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 10px 28px rgba(217, 4, 41, 0.7);
+}
+
+.btn-danger:active {
+  transform: translateY(2px) scale(0.97);
+}
+
+/* Karty Porażki & Zwycięstwa */
+.modal-icon-header {
+  font-size: 2.8rem;
+  letter-spacing: 4px;
+}
+
+.danger-headline {
+  color: #ff6b6b;
+  font-size: 1.85rem;
+  font-weight: 900;
+  text-shadow: 0 2px 12px rgba(217, 4, 41, 0.6);
+}
+
+.victory-headline {
+  color: var(--alk-gold-light);
+  font-size: 1.85rem;
+  font-weight: 900;
+  text-shadow: 0 2px 14px var(--alk-gold-glow);
+}
+
+.flavor-text {
+  font-size: 0.95rem;
+  color: var(--alk-text-muted);
+  max-width: 480px;
+  line-height: 1.4;
+}
+
+.score-summary {
+  width: 100%;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.summary-metric {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.88rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 6px;
+}
+
+.summary-metric:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.summary-label {
+  color: var(--alk-text-muted);
+}
+
+.summary-value {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.summary-value.red {
+  color: #ff6b6b;
+}
+
+.summary-value.green {
+  color: #52b788;
+}
+
+.summary-value.warning {
+  color: var(--alk-gold-light);
+}
+
+.summary-value.gold {
+  color: var(--alk-gold);
+}
+
+/* ==========================================================================
+   5. RESPONSYWNOŚĆ & EKRANOWE PRZYCISKI STEROWANIA (#mobile-controls)
+   Domyślnie ukryte na desktopie, włączane w widokach poniżej 768px
+   ========================================================================== */
+#mobile-controls,
+.mobile-controls,
+#touch-controls,
+.touch-controls {
+  display: none; /* Domyślnie ukryte na desktopie */
+  width: 100%;
+  max-width: 800px;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  gap: 16px;
+  touch-action: none;
+}
+
+/* Stylizacja elementów D-Pad */
+.dpad-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.dpad-horizontal {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.dpad-btn {
+  width: 56px;
+  height: 56px;
+  background: rgba(0, 34, 68, 0.85);
+  border: 2px solid var(--alk-gold);
+  border-radius: 14px;
+  color: #ffffff;
+  font-size: 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  touch-action: none;
+  transition: all 0.1s ease;
+}
+
+.dpad-btn:active, .dpad-btn.pressed {
+  background: var(--alk-gold);
+  color: var(--alk-navy);
+  transform: scale(0.92);
+  box-shadow: 0 2px 6px var(--alk-gold-glow);
+}
+
+.dpad-center {
+  width: 44px;
+  height: 44px;
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: 8px;
+}
+
+/* Touch Action (Przycisk Sprint) */
+.touch-action-container {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.touch-action-btn {
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--alk-blue), #00b4d8);
+  border: 3px solid var(--alk-gold);
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  box-shadow: 
+    0 6px 20px rgba(0, 75, 135, 0.6),
+    0 0 14px var(--alk-gold-glow);
+  touch-action: none;
+  transition: all 0.12s ease;
+}
+
+.touch-action-btn:active, .touch-action-btn.pressed {
+  background: linear-gradient(135deg, var(--alk-gold-light), var(--alk-gold));
+  color: var(--alk-navy);
+  transform: scale(0.92);
+  box-shadow: 0 2px 12px var(--alk-gold);
+}
+
+.touch-btn-icon {
+  font-size: 1.7rem;
+}
+
+.touch-btn-label {
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+}
+
+/* Stopka */
+.game-footer {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.75rem;
+  color: var(--alk-text-muted);
+  padding: 8px 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.footer-hint {
+  color: #52b788;
+  font-weight: 700;
+}
+
+/* ==========================================================================
+   3. REGUŁA @media (max-width: 768px) DLA SMARTFONÓW
+   Włącz wyświetlanie ekranowych przycisków sterowania (#mobile-controls)
+   ========================================================================== */
+@media (max-width: 768px) {
+  /* Włącz wyświetlanie ekranowych przycisków sterowania */
+  #mobile-controls,
+  .mobile-controls,
+  #touch-controls,
+  .touch-controls {
+    display: flex;
+  }
+
+  .mobile-only-text {
+    display: inline;
+  }
+
+  body {
+    padding: 6px;
+  }
+
+  .game-wrapper {
+    gap: 8px;
+  }
+
+  .hud-bar {
+    padding: 8px 12px;
+    gap: 10px;
+  }
+
+  .hud-game-title {
+    font-size: 0.95rem;
+  }
+
+  .hud-metric {
+    min-width: 120px;
+  }
+
+  .speech-bubble {
+    top: 8px;
+    padding: 8px 12px;
+    gap: 8px;
+  }
+
+  .bubble-text {
+    font-size: 0.84rem;
+  }
+
+  .bubble-avatar {
+    width: 36px;
+    height: 36px;
+    font-size: 1.6rem;
+  }
+
+  .modal-card {
+    padding: 18px 16px;
+    gap: 10px;
+  }
+
+  .game-headline {
+    font-size: 1.45rem;
+  }
+
+  .game-headline .subtitle {
+    font-size: 0.98rem;
+  }
+
+  .legend-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .btn {
+    padding: 12px 20px;
+    font-size: 0.95rem;
+  }
+}
+
+/* Animacje pomocnicze */
+@keyframes pop-in {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) scale(0.65) translateY(-8px);
+  }
+  70% {
+    opacity: 1;
+    transform: translateX(-50%) scale(1.05) translateY(2px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(-50%) scale(1) translateY(0);
+  }
+}
+
+@keyframes modal-enter {
+  from {
+    transform: scale(0.9) translateY(16px);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes logo-glow {
+  0%, 100% {
+    filter: drop-shadow(0 2px 6px var(--alk-gold-glow));
+  }
+  50% {
+    filter: drop-shadow(0 2px 12px var(--alk-gold));
+  }
+}
+
+@keyframes pulse-danger {
+  from {
+    box-shadow: 0 0 4px var(--alk-danger-red);
+  }
+  to {
+    box-shadow: 0 0 16px var(--alk-danger-light);
+  }
+}

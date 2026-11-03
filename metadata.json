@@ -1,0 +1,6 @@
+{
+  "name": "Kozminski Escape: Polowanie na ECTS",
+  "description": "Gra przeglądarkowa 2D w klimacie Akademii Leona Koźmińskiego w Warszawie. Zbieraj punkty ECTS, uciekaj przed Egzaminatorem z czerwonym długopisem i obroń semestr!",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
