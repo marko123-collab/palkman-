@@ -41,6 +41,9 @@ Twoim tropem podąża jednak bezlitosny **Egzaminator uzbrojony w czerwony dług
 * **Przycisk ⚡ SPRINT** (prawy dolny róg) — Bieg ze sprintem
 * Interfejs automatycznie aktywuje kontrolery dotykowe w widokach poniżej **768px**
 
+4. odpalanie gierki
+   pobieramy i rozpakowujemy całe repo i otwieramy plik index.html przeglądarka
+   
 ---
 
 ## 📁 Struktura Projektu
